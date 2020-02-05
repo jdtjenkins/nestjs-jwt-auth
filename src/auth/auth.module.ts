@@ -9,7 +9,7 @@ import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 
 // Strategies
-import { LocalStrategy } from './local.strategy';
+import { BasicStrategy } from './basic.strategy';
 import { JwtStrategy } from './jwt.strategy';
 
 // Constants
@@ -26,7 +26,7 @@ import { jwtConstants } from './constants';
 	],
 	providers: [
 		AuthService,
-		LocalStrategy,
+		BasicStrategy,
 		JwtStrategy,
 	],
 	exports: [AuthService],
