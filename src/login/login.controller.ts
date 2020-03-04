@@ -2,6 +2,13 @@ import { Controller, Request, Post, UseGuards, Get, Headers } from '@nestjs/comm
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from '../auth/auth.service';
 
+// Interfaces
+import { NestAuthUser } from '../users/users.interface';
+
+interface RequestWithUser extends Request {
+	user: NestAuthUser
+}
+
 @Controller()
 export class LoginController {
 	constructor(private readonly authService: AuthService) { }
@@ -10,18 +17,14 @@ export class LoginController {
 	@Post('auth/login')
 	async login(
 		@Headers('authorization') auth: string,
-		@Request() req: Request,
+		@Request() req: RequestWithUser,
 	) {
-		console.log(req)
-		const encodedToken = auth.split('Basic ')[1];
-		const [username, password] = Buffer.from(encodedToken, 'base64').toString().split(':');
-
-		return this.authService.login(username, password);
+		return this.authService.login(req.user);
 	}
 
 	@UseGuards(AuthGuard('jwt'))
 	@Get('profile')
-	getProfile(@Request() req) {
+	getProfile(@Request() req: RequestWithUser) {
 		return req.user;
 	}
 }

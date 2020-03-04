@@ -1,28 +1,30 @@
 import { Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 
-export type User = any;
+// Interfaces
+import { NestAuthUser } from './users.interface';
 
 @Injectable()
 export class UsersService {
-  private readonly users: User[] = [
-	{
-	  userId: 1,
-	  username: 'john',
-	  password: 'changeme',
-	},
-	{
-	  userId: 2,
-	  username: 'chris',
-	  password: 'secret',
-	},
-	{
-	  userId: 3,
-	  username: 'maria',
-	  password: 'guess',
-	},
-  ];
+	private readonly users: NestAuthUser[] = [
+		{
+			id: 1,
+			username: 'john',
+			password: '$2b$10$1jZZVBX9Jk4p90xEZJ7fVepfIV8kYGk8MvKSc7VneQ90bnl5X3yJi',
+		},
+		{
+			id: 2,
+			username: 'chris',
+			password: '$2b$10$1jZZVBX9Jk4p90xEZJ7fVepfIV8kYGk8MvKSc7VneQ90bnl5X3yJi',
+		},
+		{
+			id: 3,
+			username: 'maria',
+			password: '$2b$10$1jZZVBX9Jk4p90xEZJ7fVepfIV8kYGk8MvKSc7VneQ90bnl5X3yJi',
+		},
+	];
 
-  async findOne(username: string): Promise<User | undefined> {
-    return this.users.find(user => user.username === username);
-  }
+	findOne(username: string): NestAuthUser | undefined {
+		return this.users.find(user => user.username === username);
+	}
 }
