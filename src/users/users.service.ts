@@ -4,8 +4,18 @@ import * as bcrypt from 'bcrypt';
 // Interfaces
 import { NestAuthUser } from './users.interface';
 
+// Services
+import { NestAuthDatabaseService } from '../database/database.service';
+
+// Entities
+import { NestAuthUserEntity as UserEntity } from '../database/entities/user.entity';
+
 @Injectable()
 export class UsersService {
+	public constructor(
+		private databaseService: NestAuthDatabaseService,
+	) { }
+
 	private readonly users: NestAuthUser[] = [
 		{
 			id: 1,
@@ -24,7 +34,7 @@ export class UsersService {
 		},
 	];
 
-	findOne(username: string): NestAuthUser | undefined {
-		return this.users.find(user => user.username === username);
+	public async findOne(username: string): Promise<NestAuthUser | undefined> {
+		return this.databaseService.database.getRepository(UserEntity).findOne({ username });
 	}
 }
