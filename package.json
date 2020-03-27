@@ -1,5 +1,5 @@
 {
-	"name": "@jdtjenkins/nest-auth",
+	"name": "nestjs-jwt-auth",
 	"version": "0.0.1",
 	"description": "A plug-and-play auth module for the NestJS framework",
 	"author": "jdtjenkins <github.com/jdtjenkins>",
