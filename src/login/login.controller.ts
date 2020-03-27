@@ -11,7 +11,9 @@ interface RequestWithUser extends Request {
 
 @Controller()
 export class LoginController {
-	constructor(private readonly authService: AuthService) { }
+	constructor(
+		private readonly authService: AuthService,
+	) { }
 
 	@UseGuards(AuthGuard('basic'))
 	@Post('auth/login')
@@ -20,11 +22,5 @@ export class LoginController {
 		@Request() req: RequestWithUser,
 	) {
 		return this.authService.login(req.user);
-	}
-
-	@UseGuards(AuthGuard('jwt'))
-	@Get('profile')
-	getProfile(@Request() req: RequestWithUser) {
-		return req.user;
 	}
 }

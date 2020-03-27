@@ -1,33 +1,32 @@
+import { Inject } from '@nestjs/common';
 import {
 	createConnection,
 	Connection,
-	getConnection,
 } from 'typeorm';
 
 // Entities
 import { NestAuthUserEntity } from './entities/user.entity';
 
 export class NestAuthDatabaseService {
-	private _databaseConnection: Connection;
 
-	public constructor() {
+	public constructor(
+		@Inject(Connection)
+		private connection: Connection,
+	) {
+		connection.options.entities.push(NestAuthUserEntity);
+
 		(async () => {
-			try {
-				// Default connection found
-				this.setDatabase(getConnection());
-			} catch {
-				// Need to connect to the db ourselves
-				this.setDatabase(await this.createConnection());
-			}
+			await connection.close();
+			await connection.connect();
 		})();
 	}
 
 	public get database(): Connection {
-		return this._databaseConnection;
-	}
-
-	private setDatabase(connection: Connection) {
-		this._databaseConnection = connection;
+		try {
+			return this.connection;
+		} catch (e) {
+			throw e;
+		}
 	}
 
 	private createConnection(): Promise<Connection> {
