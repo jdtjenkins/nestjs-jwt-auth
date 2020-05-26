@@ -1,25 +1,26 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { DynamicModule } from '@nestjs/common';
 
 // Modules
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-import { LoginModule } from './login/login.module';
-import { NestAuthDatabaseModule } from './database/database.module';
+import { AuthModule } from '@auth/auth.module';
+import { UsersModule } from '@users/users.module';
+import { LoginModule } from '@login/login.module';
+import { NestAuthDatabaseModule } from '@database/database.module';
 
-@Module({
-	imports: [
-		// TypeOrmModule.forRoot({
-		// 	type: 'mysql',
-		// 	host: 'localhost',
-		// 	port: 3306,
-		// 	username: 'root',
-		// 	password: 'example',
-		// }),
-		AuthModule,
-		UsersModule,
-		LoginModule,
-		NestAuthDatabaseModule,
-	],
-})
-export class AppModule { }
+// Interfaces
+import { AppModuleInstantiationOptions } from '@core/interfaces/config-options.interface';
+
+export class AppModule {
+	public static forRoot(options: AppModuleInstantiationOptions = {
+		jwtSecret: 'super-secret-jwt-secret',
+	}): DynamicModule {
+		return {
+			module: AppModule,
+			imports: [
+				AuthModule.forRoot(options),
+				UsersModule,
+				LoginModule,
+				NestAuthDatabaseModule,
+			],
+		}
+	}
+}

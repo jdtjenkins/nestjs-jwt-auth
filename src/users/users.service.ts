@@ -4,10 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { NestAuthUser } from './users.interface';
 
 // Services
-import { NestAuthDatabaseService } from '../database/database.service';
-
-// Entities
-import { NestAuthUserEntity } from '../database/entities/user.entity';
+import { NestAuthDatabaseService } from '@database/database.service';
 
 @Injectable()
 export class UsersService {
@@ -16,6 +13,12 @@ export class UsersService {
 	) { }
 
 	public async findOne(username: string): Promise<NestAuthUser | undefined> {
-		return this.databaseService.database.getRepository(NestAuthUserEntity).findOne({ username });
+		return this.databaseService.database
+			.createQueryBuilder()
+			.select('users')
+			.where('user.username = :username', {
+				username,
+			})
+			.getOne();
 	}
 }
