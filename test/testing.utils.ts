@@ -1,6 +1,7 @@
 import { createConnection, ConnectionOptions } from 'typeorm';
 import * as getPort from 'get-port';
 import { Docker } from 'docker-cli-js';
+import { join } from 'path';
 
 const checkConnection = async (databaseOptions: ConnectionOptions): Promise<boolean> => {
 	return new Promise(async resolve => {
@@ -20,8 +21,9 @@ const startDockerContainer = async (): Promise<{ containerId: string, databasePo
 	const docker = new Docker();
 	let databasePort: number = await getPort();
 	let containerId: string;
+	const sqlVolumePath: string = join(__dirname, 'sql');
 
-	const dockerCommandOutput = await docker.command(`run --name "nestjs-jwt-auth_mysql_${ databasePort }" --rm -e "MYSQL_ROOT_PASSWORD=example" -e "MYSQL_DATABASE=test" -p ${ databasePort }:3306 -d mysql --default-authentication-plugin=mysql_native_password`);
+	const dockerCommandOutput = await docker.command(`run --name "nestjs-jwt-auth_mysql_${ databasePort }" --rm -e "MYSQL_ROOT_PASSWORD=example" -e "MYSQL_DATABASE=test" -p ${ databasePort }:3306 -v ${ sqlVolumePath }:/docker-entrypoint-initdb.d -d mysql --default-authentication-plugin=mysql_native_password`);
 	containerId = dockerCommandOutput.containerId;
 
 	await checkConnection({
