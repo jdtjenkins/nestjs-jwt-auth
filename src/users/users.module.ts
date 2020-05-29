@@ -1,14 +1,17 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 // Services
 import { UsersService } from './users.service';
 
-// Modules
-import { NestAuthDatabaseModule } from '../database/database.module';
+// Entities
+import { NestAuthUserEntity } from '@core/entities/user.entity';
 
 @Module({
 	imports: [
-		NestAuthDatabaseModule,
+		TypeOrmModule.forFeature([
+			NestAuthUserEntity,
+		]),
 	],
 	providers: [
 		UsersService,

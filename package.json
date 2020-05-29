@@ -27,7 +27,7 @@
 		"test:watch": "jest --watch",
 		"test:cov": "jest --coverage",
 		"test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-		"test:e2e": "export NODE_ENV=test || set NODE_ENV=test && jest --config ./test/jest-e2e.json"
+		"test:e2e": "npx cross-env NODE_ENV=test && jest --config ./test/jest-e2e.json"
 	},
 	"peerDependencies": {
 		"@nestjs/common": "^6.11.11",
@@ -45,6 +45,7 @@
 		"@types/bcrypt": "^3.0.0",
 		"@types/passport-http": "^0.3.8",
 		"bcrypt": "^3.0.8",
+		"cross-env": "^7.0.2",
 		"mysql": "^2.18.1",
 		"passport": "^0.4.1",
 		"passport-http": "^0.3.0",

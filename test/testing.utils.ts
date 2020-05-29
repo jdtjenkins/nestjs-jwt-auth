@@ -1,6 +1,6 @@
 import { createConnection, ConnectionOptions } from 'typeorm';
 import * as getPort from 'get-port';
-import { Docker } from 'docker-cli-js';
+import { Docker, Options as DockerOptions, Options } from 'docker-cli-js';
 import { join } from 'path';
 
 const checkConnection = async (databaseOptions: ConnectionOptions): Promise<boolean> => {
@@ -18,7 +18,8 @@ const checkConnection = async (databaseOptions: ConnectionOptions): Promise<bool
 }
 
 const startDockerContainer = async (): Promise<{ containerId: string, databasePort: number }> => {
-	const docker = new Docker();
+	const dockerOptions = new DockerOptions(null, null, false);
+	const docker = new Docker(dockerOptions);
 	let databasePort: number = await getPort();
 	let containerId: string;
 	const sqlVolumePath: string = join(__dirname, 'sql');
@@ -27,6 +28,7 @@ const startDockerContainer = async (): Promise<{ containerId: string, databasePo
 	containerId = dockerCommandOutput.containerId;
 
 	await checkConnection({
+		name: 'nestjs-jwt-auth_test-connection',
 		type: 'mysql',
 		host: 'localhost',
 		port: databasePort,
@@ -42,7 +44,8 @@ const startDockerContainer = async (): Promise<{ containerId: string, databasePo
 }
 
 export const stopDockerContainer = async (containerId: string): Promise<void> => {
-	const docker = new Docker();
+	const dockerOptions = new DockerOptions(null, null, false);
+	const docker = new Docker(dockerOptions);
 
 	try {
 		await docker.command(`stop ${ containerId }`);
@@ -52,7 +55,11 @@ export const stopDockerContainer = async (containerId: string): Promise<void> =>
 }
 
 export const startTestingDatabase = async (): Promise<{ containerId: string, databasePort: number }> => {
-	const container = await startDockerContainer();
+	try {
+		const container = await startDockerContainer();
 
-	return container;
+		return container;
+	} catch (e) {
+		throw new Error(e);
+	}
 }

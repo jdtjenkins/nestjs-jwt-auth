@@ -5,6 +5,7 @@
 		"removeComments": true,
 
 		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
 		"target": "es2017",
 		"sourceMap": true,
 		"outDir": "./dist",
@@ -17,6 +18,7 @@
 			"@users/*": ["users/*"],
 			"@login/*": ["login/*"],
 			"@test/*": ["../test/*"],
+			"@src/*": ["./*"]
 		},
 	},
 	"exclude": ["node_modules", "dist"],

@@ -1,24 +1,23 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, getConnection } from 'typeorm';
 
-// Interfaces
-import { NestAuthUser } from './users.interface';
-
-// Services
-import { NestAuthDatabaseService } from '@database/database.service';
+// Entities
+import { NestAuthUserEntity } from '@core/entities/user.entity';
 
 @Injectable()
 export class UsersService {
 	public constructor(
-		private databaseService: NestAuthDatabaseService,
-	) { }
+		@InjectRepository(NestAuthUserEntity)
+		private usersRepository: Repository<NestAuthUserEntity>,
+	) {}
 
-	public async findOne(username: string): Promise<NestAuthUser | undefined> {
-		return this.databaseService.database
-			.createQueryBuilder()
-			.select('users')
-			.where('user.username = :username', {
-				username,
-			})
-			.getOne();
+	public async findOne(username: string): Promise<any | undefined> {
+		try {
+			return await this.usersRepository
+				.findOne({username});
+		} catch (e) {
+			throw new Error(e);
+		}
 	}
 }

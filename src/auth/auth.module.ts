@@ -18,6 +18,7 @@ import { AppModuleInstantiationOptions } from '@core/interfaces/config-options.i
 // Constants
 import { jwtSecretConstant } from '@core/constants/constants.constants';
 
+@Module({})
 export class AuthModule {
 	public static forRoot(options: AppModuleInstantiationOptions = {
 		jwtSecret: 'super-secret-jwt-secret',

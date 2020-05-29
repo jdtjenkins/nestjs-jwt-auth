@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, Injectable } from '@nestjs/common';
-import { TypeOrmModule, InjectConnection, InjectRepository } from '@nestjs/typeorm';
-import { Connection, getConnection, Repository } from 'typeorm';
+import { INestApplication } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 // Utils
 import { startTestingDatabase, stopDockerContainer } from '@test/testing.utils';
@@ -14,30 +13,14 @@ import { AppModule } from '@src/app.module';
 
 // Entities
 import { NestAuthUserEntity } from '@core/entities/user.entity';
-
-// Mock Services
-@Injectable()
-class MockTestTypeOrmConnectionService {
-	public constructor(
-		@InjectConnection('default')
-		public readonly defaultConnection: Connection,
-
-		@InjectRepository(NestAuthUserEntity)
-		public readonly usersRepository: Repository<NestAuthUserEntity>
-	) {}
-
-	public getDefaultConnection(): Connection {
-		return getConnection();
-	}
-}
+import { getConnection } from 'typeorm';
 
 jest.setTimeout(25000);
 
-describe('App E2E', () => {
+describe('Users E2E', () => {
 	let app: INestApplication;
 	let container: { containerId: string, databasePort: number };
 
-	let mockTestTypeOrmConnectionService: MockTestTypeOrmConnectionService;
 	let usersService: UsersService;
 
 	beforeAll(async done => {
@@ -49,9 +32,6 @@ describe('App E2E', () => {
 		}
 
 		const moduleFixture: TestingModule = await Test.createTestingModule({
-			providers: [
-				MockTestTypeOrmConnectionService,
-			],
 			imports: [
 				AppModule.forRoot(),
 				TypeOrmModule.forRoot({
@@ -65,18 +45,15 @@ describe('App E2E', () => {
 						NestAuthUserEntity,
 					],
 				}),
-				TypeOrmModule.forFeature([
-					NestAuthUserEntity,
-				]),
 			],
 		}).compile();
 
 		app = moduleFixture.createNestApplication();
 
-		mockTestTypeOrmConnectionService = await app.get(MockTestTypeOrmConnectionService);
 		usersService = await app.get(UsersService);
 
 		await app.init();
+
 		done();
 	});
 
@@ -90,16 +67,36 @@ describe('App E2E', () => {
 		await app.close();
 	});
 
-	describe('init', () => {
-		it('App should be defined', () => {
-			expect(app).toBeDefined();
-		});
-	});
+	describe('findOne', () => {
+		fit('Should find user', async done => {
+			const username = 'test@test.com';
 
-	describe('mockTestTypeOrmConnectionService', () => {
-		it('defaultConnection should be defined', () => {
-			expect(mockTestTypeOrmConnectionService.defaultConnection).toBeDefined();
-			expect(mockTestTypeOrmConnectionService.defaultConnection?.isConnected).toBeDefined();
+			try {
+				await getConnection()
+					.createQueryBuilder()
+					.insert()
+					.into(NestAuthUserEntity)
+					.values([
+						{
+							username,
+							password: '$2b$05$NGLMjZ6Mc.RxOyFXKGVah.HO.m4bwUpMWm.NvqQ9jB0LZsVCe2Vli', // "password" hashed, 5 rounds
+						},
+					])
+					.execute();
+			} catch (e) {
+				console.log(e);
+				return;
+			}
+
+			try {
+				const user = await usersService.findOne(username);
+
+				expect(user).toBeDefined();
+
+				done();
+			} catch (e) {
+				console.log(e);
+			}
 		});
 	});
 });
